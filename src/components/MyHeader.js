@@ -1,11 +1,11 @@
 import React from "react";
 
-const MyHeader = ({ headText, leftchild, rightchild }) => {
+const MyHeader = ({ headText, leftChild, rightChild }) => {
   return (
     <header>
-      <div className="head_btn_left">{leftchild}</div>
+      <div className="head_btn_left">{leftChild}</div>
       <div className="head_text">{headText}</div>
-      <div className="head_btn_right">{rightchild}</div>
+      <div className="head_btn_right">{rightChild}</div>
     </header>
   );
 };

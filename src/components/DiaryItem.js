@@ -1,8 +1,13 @@
 import React from "react";
-import MyButton from "./MyButton";
 import { useNavigate } from "react-router-dom";
+import MyButton from "./MyButton";
+
 const DiaryItem = ({ id, emotion, content, date }) => {
   const navigate = useNavigate();
+
+  const env = process.env;
+  env.PUBLIC_URL = env.PUBLIC_URL || "";
+
   const strDate = new Date(parseInt(date)).toLocaleDateString();
 
   const goDetail = () => {
@@ -22,10 +27,7 @@ const DiaryItem = ({ id, emotion, content, date }) => {
           `emotion_img_wrapper_${emotion}`,
         ].join(" ")}
       >
-        <img
-          src={process.env.PUBLIC_URL + `assets/emotion${emotion}.png`}
-          alt="감정"
-        />
+        <img src={process.env.PUBLIC_URL + `assets/emotion${emotion}.png`} />
       </div>
       <div onClick={goDetail} className="info_wrapper">
         <div className="diary_date">{strDate}</div>
@@ -38,4 +40,4 @@ const DiaryItem = ({ id, emotion, content, date }) => {
   );
 };
 
-export default DiaryItem;
+export default React.memo(DiaryItem);

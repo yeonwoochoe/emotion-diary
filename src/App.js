@@ -1,4 +1,5 @@
-import React, { useReducer, useRef } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
+
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
@@ -34,46 +35,29 @@ const reducer = (state, action) => {
   localStorage.setItem("diary", JSON.stringify(newState));
   return newState;
 };
+
 export const DiaryStateContext = React.createContext();
 export const DiaryDispatchContext = React.createContext();
 
-const dummyDate = [
-  {
-    id: 1,
-    emotion: 1,
-    content: "오늘의일기1번",
-    date: 1645080200157,
-  },
-  {
-    id: 2,
-    emotion: 2,
-    content: "오늘의일기2번",
-    date: 1645080200158,
-  },
-  {
-    id: 3,
-    emotion: 3,
-    content: "오늘의일기3번",
-    date: 1645080200159,
-  },
-  {
-    id: 4,
-    emotion: 4,
-    content: "오늘의일기4번",
-    date: 1645080200160,
-  },
-  {
-    id: 5,
-    emotion: 5,
-    content: "오늘의일기5번",
-    date: 1645080200161,
-  },
-];
 function App() {
-  const [data, dispatch] = useReducer(reducer, dummyDate);
+  const [data, dispatch] = useReducer(reducer, []);
+
+  useEffect(() => {
+    const localData = localStorage.getItem("diary");
+    if (localData) {
+      const diaryList = JSON.parse(localData).sort(
+        (a, b) => parseInt(b.id) - parseInt(a.id)
+      );
+
+      if (diaryList.length >= 1) {
+        dataId.current = parseInt(diaryList[0].id) + 1;
+        dispatch({ type: "INIT", data: diaryList });
+      }
+    }
+  }, []);
 
   const dataId = useRef(0);
-  //CREATE
+  // CREATE
   const onCreate = (date, content, emotion) => {
     dispatch({
       type: "CREATE",
@@ -86,17 +70,16 @@ function App() {
     });
     dataId.current += 1;
   };
-  //REMOVE
-
-  const onRemove = (targekId) => {
-    dispatch({ type: "REMOVE", targekId });
+  // REMOVE
+  const onRemove = (targetId) => {
+    dispatch({ type: "REMOVE", targetId });
   };
-  //EDIT
-  const onEdit = (targekId, date, content, emotion) => {
+  // EDIT
+  const onEdit = (targetId, date, content, emotion) => {
     dispatch({
       type: "EDIT",
       data: {
-        id: targekId,
+        id: targetId,
         date: new Date(date).getTime(),
         content,
         emotion,
@@ -106,13 +89,19 @@ function App() {
 
   return (
     <DiaryStateContext.Provider value={data}>
-      <DiaryDispatchContext.Provider value={{ onCreate, onEdit, onRemove }}>
+      <DiaryDispatchContext.Provider
+        value={{
+          onCreate,
+          onEdit,
+          onRemove,
+        }}
+      >
         <BrowserRouter>
           <div className="App">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/new" element={<New />} />
-              <Route path="/edit" element={<Edit />} />
+              <Route path="/edit/:id" element={<Edit />} />
               <Route path="/diary/:id" element={<Diary />} />
             </Routes>
           </div>
